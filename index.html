@@ -4,54 +4,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPv4 Binary Converter</title>
+    <title>IPv4 Subnetting Calculator</title>
 
-    <!-- CSS File -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
 
-        <h1>IPv4 Binary Converter</h1>
+        <h1>IPv4 Subnetting Calculator</h1>
 
-        <p class="description">
-            Convert an IPv4 decimal address into its
-            corresponding 8-bit binary octets.
-        </p>
+        <!-- DECIMAL TO BINARY -->
+        <section class="calculator-section">
 
-        <label for="ipAddress">IPv4 Address</label>
+            <h2>Decimal to Binary</h2>
 
-        <input
-            type="text"
-            id="ipAddress"
-            placeholder="e.g. 192.168.1.0"
-            maxlength="15"
-        >
-
-        <button id="convertBtn">Convert to Binary</button>
-
-        <div class="result-box">
-            <h2>Binary Result</h2>
-
-            <p id="result" class="binary-result">
-                00000000.00000000.00000000.00000000
+            <p class="description">
+                Convert an IPv4 address into 8-bit binary octets.
             </p>
 
-            <button id="copyBtn" class="copy-btn">
-                Copy Binary
-            </button>
-        </div>
+            <label for="ipAddress">IPv4 Address</label>
 
-        <p id="error" class="error"></p>
+            <input
+                type="text"
+                id="ipAddress"
+                placeholder="e.g. 192.168.1.0"
+                maxlength="15"
+            >
+
+            <button id="convertBtn">Convert to Binary</button>
+
+            <div class="result-box">
+                <h3>Binary Result</h3>
+
+                <p id="result" class="binary-result">
+                    00000000.00000000.00000000.00000000
+                </p>
+
+                <button id="copyBtn" class="copy-btn">
+                    Copy Binary
+                </button>
+            </div>
+
+            <p id="error" class="error"></p>
+
+        </section>
+
+
+        <!-- SUBNET MASK -->
+        <section class="calculator-section">
+
+            <h2>Subnet Mask Converter</h2>
+
+            <p class="description">
+                Convert an IPv4 address with CIDR notation
+                into its subnet mask.
+            </p>
+
+            <label for="cidrAddress">IPv4 with CIDR</label>
+
+            <input
+                type="text"
+                id="cidrAddress"
+                placeholder="e.g. 171.30.0.0/23"
+            >
+
+            <button id="maskBtn">Calculate Subnet</button>
+
+            <div class="result-box">
+
+                <h3>Subnet Mask (Decimal)</h3>
+
+                <p id="maskDecimal" class="decimal-result">
+                    255.255.254.0
+                </p>
+
+                <h3>Subnet Mask (Binary)</h3>
+
+                <p id="maskBinary" class="binary-result">
+                    11111111.11111111.11111110.00000000
+                </p>
+
+            </div>
+
+            <p id="maskError" class="error"></p>
+
+        </section>
+
+
+        <!-- SUBNET DETAILS -->
+        <section class="calculator-section">
+
+            <h2>Subnet Details</h2>
+
+            <div class="result-box">
+
+                <div class="detail-row">
+                    <h3>Network Address</h3>
+                    <p id="networkAddress" class="decimal-result">-</p>
+                </div>
+
+                <div class="detail-row">
+                    <h3>Broadcast Address</h3>
+                    <p id="broadcastAddress" class="decimal-result">-</p>
+                </div>
+
+                <div class="detail-row">
+                    <h3>First Usable Host</h3>
+                    <p id="firstHost" class="decimal-result">-</p>
+                </div>
+
+                <div class="detail-row">
+                    <h3>Last Usable Host</h3>
+                    <p id="lastHost" class="decimal-result">-</p>
+                </div>
+
+                <div class="detail-row">
+                    <h3>Total IP Addresses</h3>
+                    <p id="totalAddresses" class="decimal-result">-</p>
+                </div>
+
+                <div class="detail-row">
+                    <h3>Usable Host Addresses</h3>
+                    <p id="usableHosts" class="decimal-result">-</p>
+                </div>
+
+            </div>
+
+        </section>
 
         <p class="footer">
-            IPv4 Address Converter | Decimal to Binary
+            IPv4 Subnetting Calculator | Binary | CIDR | Subnetting
         </p>
 
     </div>
 
-    <!-- JavaScript File -->
     <script src="script.js"></script>
 
 </body>
