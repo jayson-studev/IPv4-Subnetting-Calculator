@@ -178,3 +178,63 @@ button:hover {
         font-size: 14px;
     }
 }
+
+
+/* ALL SUBNET NETWORKS TABLE */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 450px;
+}
+
+thead {
+    background: #1e293b;
+}
+
+th,
+td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid #334155;
+    font-size: 14px;
+}
+
+th {
+    color: #38bdf8;
+}
+
+td {
+    color: #f8fafc;
+    font-family: monospace;
+}
+
+tbody tr:hover {
+    background: #1e293b;
+}
+
+.subnet-summary {
+    margin-bottom: 15px;
+    color: #4ade80;
+    font-weight: bold;
+}
+
+.table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
