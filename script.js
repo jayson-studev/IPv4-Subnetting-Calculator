@@ -18,6 +18,9 @@ const lastHost = document.getElementById("lastHost");
 const totalAddresses = document.getElementById("totalAddresses");
 const usableHosts = document.getElementById("usableHosts");
 
+const subnetTableBody = document.getElementById("subnetTableBody");
+const subnetCount = document.getElementById("subnetCount");
+
 
 // ===================================
 // IPV4 VALIDATION
@@ -72,6 +75,30 @@ function numberToIP(number) {
 
 
 // ===================================
+// CLASSFUL NETWORK PREFIX
+// ===================================
+
+function getClassfulPrefix(ip) {
+
+    const firstOctet = Number(ip.split(".")[0]);
+
+    if (firstOctet >= 1 && firstOctet <= 126) {
+        return 8; // Class A
+    }
+
+    if (firstOctet >= 128 && firstOctet <= 191) {
+        return 16; // Class B
+    }
+
+    if (firstOctet >= 192 && firstOctet <= 223) {
+        return 24; // Class C
+    }
+
+    return null;
+}
+
+
+// ===================================
 // DECIMAL IP TO BINARY
 // ===================================
 
@@ -100,7 +127,110 @@ function convertIP() {
 
 
 // ===================================
-// SUBNET CALCULATOR
+// GENERATE ALL SUBNETS
+// ===================================
+
+function generateAllSubnets(ip, prefixLength) {
+
+    subnetTableBody.innerHTML = "";
+    subnetCount.textContent = "Number of Subnets: -";
+
+    const classfulPrefix = getClassfulPrefix(ip);
+
+    if (classfulPrefix === null) {
+
+        subnetTableBody.innerHTML = `
+            <tr>
+                <td colspan="3">
+                    Unsupported IPv4 address class.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    if (prefixLength < classfulPrefix) {
+
+        subnetTableBody.innerHTML = `
+            <tr>
+                <td colspan="3">
+                    CIDR prefix must be ${classfulPrefix} or higher
+                    for this classful network.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    // Calculate the number of borrowed subnet bits
+    const subnetBits = prefixLength - classfulPrefix;
+
+    const subnetCountValue =
+        1n << BigInt(subnetBits);
+
+    // Maximum number of rows displayed
+    const MAX_SUBNETS = 4096;
+
+    if (subnetCountValue > BigInt(MAX_SUBNETS)) {
+
+        subnetCount.textContent =
+            `Number of Subnets: ${subnetCountValue.toString()}`;
+
+        subnetTableBody.innerHTML = `
+            <tr>
+                <td colspan="3">
+                    Too many subnets to display at once.
+                    Maximum display is ${MAX_SUBNETS}.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    // Number of IP addresses in each subnet
+    const addressesPerSubnet =
+        1n << BigInt(32 - prefixLength);
+
+    const ipValue = ipToNumber(ip);
+
+    // Create the classful network mask
+    const classfulMask =
+        (0xFFFFFFFFn << BigInt(32 - classfulPrefix)) &
+        0xFFFFFFFFn;
+
+    // Find the parent classful network
+    const classfulNetwork = ipValue & classfulMask;
+
+    subnetCount.textContent =
+        `Number of Subnets: ${subnetCountValue.toString()}`;
+
+    // Generate every subnet
+    for (let i = 0n; i < subnetCountValue; i++) {
+
+        const network =
+            classfulNetwork + (i * addressesPerSubnet);
+
+        const broadcast =
+            network + addressesPerSubnet - 1n;
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${(i + 1n).toString()}</td>
+            <td>${numberToIP(network)}</td>
+            <td>${numberToIP(broadcast)}</td>
+        `;
+
+        subnetTableBody.appendChild(row);
+    }
+}
+
+
+// ===================================
+// SUBNET MASK CALCULATOR
 // ===================================
 
 function calculateMask() {
@@ -117,12 +247,24 @@ function calculateMask() {
     totalAddresses.textContent = "-";
     usableHosts.textContent = "-";
 
+    subnetTableBody.innerHTML = `
+        <tr>
+            <td colspan="3">
+                Enter an IPv4/CIDR to generate subnets.
+            </td>
+        </tr>
+    `;
+
+    subnetCount.textContent = "Number of Subnets: -";
+
     // Separate IP and CIDR
     const parts = input.split("/");
 
     if (parts.length !== 2) {
+
         maskError.textContent =
-            "Enter an IPv4 address with CIDR notation, e.g. 171.30.0.0/23.";
+            "Enter an IPv4 address with CIDR notation, e.g. 172.16.0.0/18.";
+
         return;
     }
 
@@ -131,7 +273,10 @@ function calculateMask() {
 
     // Validate IPv4
     if (!isValidIPv4(ip)) {
-        maskError.textContent = "Invalid IPv4 address.";
+
+        maskError.textContent =
+            "Invalid IPv4 address.";
+
         return;
     }
 
@@ -142,10 +287,12 @@ function calculateMask() {
 
         maskError.textContent =
             "CIDR prefix must be between 0 and 32.";
+
         return;
     }
 
     const prefixLength = Number(prefix);
+
 
     // ===================================
     // CREATE SUBNET MASK
@@ -171,9 +318,8 @@ function calculateMask() {
 
     const ipValue = ipToNumber(ip);
 
-    const allBits = 32;
-
-    const total = 1n << BigInt(allBits - prefixLength);
+    const total =
+        1n << BigInt(32 - prefixLength);
 
     const maskValue =
         prefixLength === 0
@@ -196,21 +342,18 @@ function calculateMask() {
 
     if (prefixLength === 32) {
 
-        // /32 contains one individual IP address
         first = network;
         last = network;
         usable = 1n;
 
     } else if (prefixLength === 31) {
 
-        // /31 is commonly used for point-to-point links
         first = network;
         last = broadcast;
         usable = 2n;
 
     } else {
 
-        // Standard subnet host range
         first = network + 1n;
         last = broadcast - 1n;
         usable = total - 2n;
@@ -238,6 +381,13 @@ function calculateMask() {
 
     usableHosts.textContent =
         usable.toString();
+
+
+    // ===================================
+    // GENERATE ALL SUBNET NETWORKS
+    // ===================================
+
+    generateAllSubnets(ip, prefixLength);
 }
 
 
@@ -270,12 +420,14 @@ maskBtn.addEventListener("click", calculateMask);
 
 // ENTER KEY
 ipAddress.addEventListener("keydown", function(event) {
+
     if (event.key === "Enter") {
         convertIP();
     }
 });
 
 cidrAddress.addEventListener("keydown", function(event) {
+
     if (event.key === "Enter") {
         calculateMask();
     }
