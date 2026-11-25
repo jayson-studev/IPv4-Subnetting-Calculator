@@ -132,7 +132,49 @@
             </div>
 
         </section>
+      
+      <!-- ALL SUBNET NETWORKS -->
+      <section class="calculator-section">
 
+          <h2>All Subnet Networks</h2>
+
+          <p class="description">
+              List all network and broadcast addresses
+              generated from the classful network and CIDR prefix.
+          </p>
+
+          <div class="result-box">
+
+              <div class="subnet-summary">
+                  <p id="subnetCount">Number of Subnets: -</p>
+              </div>
+
+              <div class="table-container">
+                  <table id="subnetTable">
+
+                      <thead>
+                          <tr>
+                              <th>#</th>
+                              <th>Network Address</th>
+                              <th>Broadcast Address</th>
+                          </tr>
+                      </thead>
+
+                      <tbody id="subnetTableBody">
+                          <tr>
+                              <td colspan="3">
+                                  Enter an IPv4/CIDR to generate subnets.
+                              </td>
+                          </tr>
+                      </tbody>
+
+                  </table>
+              </div>
+
+          </div>
+
+      </section>
+  
         <p class="footer">
             IPv4 Subnetting Calculator | Binary | CIDR | Subnetting
         </p>
